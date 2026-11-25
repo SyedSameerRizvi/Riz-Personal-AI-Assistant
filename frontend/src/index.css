@@ -3,46 +3,53 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --bg: #ffffff;
-  --panel: #f6f7f9;
-  --raised: #eef0f4;
-  --line: #e3e6eb;
-  --text: #16181d;
-  --muted-text: #545b68;
-  --faint: #646b78;
-  --accent-c: #4f5bd5;
-  --accent-ink: #ffffff;
-  --ok: #1a7f45;
-  --warn-bg: #fff4dd;
-  --warn-text: #8a5a00;
-  --code: #f6f7f9;
-  --code-text: #1f2328;
-  --danger: #c4314b;
-  --chart-a: #4f5bd5;
-  --chart-b: #b0601c;
-  --chart-grid: #e3e6eb;
+  /* warm butter canvas, black ink, yellow primary, neon orange accent */
+  --bg: #faf7ec;
+  --panel: #f3eedc;
+  --raised: #e9e2c9;
+  --line: #e2d9bd;
+  --text: #141412;
+  --muted-text: #57534a;
+  --faint: #6b665a;
+  --accent-c: #f5c518;
+  --accent-ink: #141412;
+  --link: #b83a06;
+  --ring-c: #e2560f;
+  --ok: #2b7a3d;
+  --warn-bg: #ffe6d3;
+  --warn-text: #9c3505;
+  --code: #161511;
+  --code-head: #201f1a;
+  --code-text: #f2eee2;
+  --danger: #b8322a;
+  --chart-a: #7e5c00;
+  --chart-b: #ee5a16;
+  --chart-grid: #e2d9bd;
   color-scheme: light;
 }
 
 .dark {
-  --bg: #0e1014;
-  --panel: #15181e;
-  --raised: #232833;
-  --line: #262b35;
-  --text: #e6e8ec;
-  --muted-text: #a0a6b1;
-  --faint: #868d9a;
-  --accent-c: #8b97ff;
-  --accent-ink: #0e1014;
-  --ok: #5fd38d;
-  --warn-bg: #3a2c12;
-  --warn-text: #f2b65a;
-  --code: #0a0c10;
-  --code-text: #d5d8de;
-  --danger: #ff8597;
-  --chart-a: #7c88f5;
-  --chart-b: #c77a35;
-  --chart-grid: #262b35;
+  --bg: #0d0d0b;
+  --panel: #161511;
+  --raised: #24221c;
+  --line: #2b2923;
+  --text: #f7f4ea;
+  --muted-text: #aca796;
+  --faint: #8f8a7c;
+  --accent-c: #f5c518;
+  --accent-ink: #0d0d0b;
+  --link: #ff7a2e;
+  --ring-c: #ff6b1a;
+  --ok: #6ccb82;
+  --warn-bg: #3a1d0b;
+  --warn-text: #ff9a57;
+  --code: #070706;
+  --code-head: #141310;
+  --code-text: #f2eee2;
+  --danger: #ff7a70;
+  --chart-a: #be9810;
+  --chart-b: #e3401f;
+  --chart-grid: #2b2923;
   color-scheme: dark;
 }
 
@@ -65,7 +72,9 @@
   --color-destructive: var(--danger);
   --color-border: var(--line);
   --color-input: var(--line);
-  --color-ring: var(--accent-c);
+  --color-ring: var(--ring-c);
+  --color-link: var(--link);
+  --color-code-head: var(--code-head);
   --color-panel: var(--panel);
   --color-raised: var(--raised);
   --color-faint: var(--faint);
@@ -76,8 +85,11 @@
   --color-code-foreground: var(--code-text);
   --font-sans: 'Inter', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
-  --radius-lg: 10px;
-  --radius-xl: 14px;
+  --font-display: 'Cormorant Garamond', Garamond, 'Times New Roman', serif;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
 }
 
 html,
@@ -102,13 +114,13 @@ body {
 
 @layer base {
   :focus-visible {
-    outline: 2px solid var(--accent-c);
+    outline: 2px solid var(--ring-c);
     outline-offset: 2px;
   }
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--accent-c) 30%, transparent);
+  background: color-mix(in srgb, var(--accent-c) 45%, transparent);
 }
 
 /* scrollbars that stay out of the way */
@@ -150,21 +162,23 @@ body {
 .prose-riz h1,
 .prose-riz h2,
 .prose-riz h3 {
+  font-family: var(--font-display);
   font-weight: 600;
+  letter-spacing: -0.01em;
   line-height: 1.3;
   margin: 18px 0 8px;
 }
 .prose-riz h1 {
-  font-size: 20px;
+  font-size: 26px;
 }
 .prose-riz h2 {
-  font-size: 17px;
+  font-size: 22px;
 }
 .prose-riz h3 {
-  font-size: 15px;
+  font-size: 19px;
 }
 .prose-riz a {
-  color: var(--accent-c);
+  color: var(--link);
   text-decoration: underline;
 }
 .prose-riz strong {
@@ -194,14 +208,14 @@ body {
   text-align: left;
 }
 
-/* highlight.js colours on the Riz palette */
+/* highlight.js colours; code windows are dark in both themes */
 .hljs {
   color: var(--code-text);
 }
 .hljs-comment,
 .hljs-quote,
 .hljs-meta {
-  color: var(--faint);
+  color: #8f8a7c;
   font-style: italic;
 }
 .hljs-keyword,
@@ -209,13 +223,13 @@ body {
 .hljs-built_in,
 .hljs-section,
 .hljs-name {
-  color: var(--accent-c);
+  color: #ff8a3d;
 }
 .hljs-string,
 .hljs-attr,
 .hljs-template-tag,
 .hljs-addition {
-  color: var(--ok);
+  color: #f5c518;
 }
 .hljs-number,
 .hljs-literal,
@@ -223,10 +237,18 @@ body {
 .hljs-variable,
 .hljs-title,
 .hljs-type {
-  color: var(--warn-text);
+  color: #9fd8a8;
 }
 .hljs-deletion {
-  color: var(--danger);
+  color: #ff7a70;
+}
+
+/* serif display voice for page headings */
+.font-display {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  font-variant-numeric: lining-nums;
 }
 
 @keyframes riz-blink {
@@ -234,19 +256,24 @@ body {
     opacity: 0;
   }
 }
-.riz-caret::after {
+.riz-caret::after,
+.riz-streaming > p:last-child::after,
+.riz-streaming > ul:last-child > li:last-child::after,
+.riz-streaming > ol:last-child > li:last-child::after {
   content: '';
   display: inline-block;
   width: 7px;
   height: 1.1em;
   margin-left: 2px;
   vertical-align: -0.2em;
-  background: var(--accent-c);
+  background: var(--ring-c);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--ring-c) 70%, transparent);
   animation: riz-blink 1s step-end infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .riz-caret::after {
+  .riz-caret::after,
+  .riz-streaming *::after {
     animation: none;
   }
 }

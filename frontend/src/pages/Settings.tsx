@@ -32,7 +32,7 @@ export function Settings({ settings, onChange }: SettingsProps) {
     <div className="min-h-0 grow overflow-y-auto">
       <div className="mx-auto flex max-w-[720px] flex-col gap-5 px-4 py-7 sm:px-8">
         <div>
-          <h1 className="text-[22px] font-semibold">Settings</h1>
+          <h1 className="font-display text-[38px] leading-[1.1]">Settings</h1>
           <p className="mt-1 text-sm text-muted-foreground">Saved on this PC as soon as you change them.</p>
         </div>
 

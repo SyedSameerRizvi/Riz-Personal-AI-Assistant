@@ -75,7 +75,7 @@ export function Sidebar(props: SidebarProps) {
     >
       <div className="flex items-center gap-2.5 px-1.5 py-1">
         <Logo />
-        <span className="grow text-[15px] font-semibold">Riz</span>
+        <span className="font-display grow text-[26px] leading-none">Riz</span>
         {props.onClose && (
           <Button variant="ghost" size="icon" aria-label="Close sidebar" onClick={props.onClose}>
             <PanelLeftClose className="size-[18px]" />
@@ -109,7 +109,7 @@ export function Sidebar(props: SidebarProps) {
         )}
         {groups.map((group) => (
           <section key={group.label} className="flex flex-col gap-0.5" aria-label={group.label}>
-            <h2 className="px-2.5 py-1 text-xs font-medium text-faint">{group.label}</h2>
+            <h2 className="px-2.5 py-1 text-[11px] font-medium tracking-[0.12em] text-faint uppercase">{group.label}</h2>
             {group.chats.map((chat) => {
               const active = view === 'chat' && chat.id === activeChatId
               if (renaming === chat.id) {

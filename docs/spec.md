@@ -118,7 +118,7 @@ REST under `/api`:
 
 ## UI
 
-Matches the mockups: clean and minimal, Inter + JetBrains Mono, one accent colour, dark and light themes following Windows.
+Warm editorial look (restyled 2026-11-25 at the user's request): butter canvas and black surfaces, yellow primary buttons, a neon orange accent for focus, links and live activity, Cormorant Garamond serif headings with Inter body and JetBrains Mono code (all bundled), dark code windows in both themes, dark and light themes following Windows. Thinking and responding states use dotted orbs from the MIT-licensed `thinking-orbs` package.
 
 - **Sidebar:** New chat, search, chats grouped Pinned / Today / Yesterday / Last 7 days / Older, rename, pin, delete. Links to Dashboard, Memory, Settings. Model and Ollama status at the bottom.
 - **Chat:** streamed replies, markdown, highlighted code with copy, Stop, Regenerate, per-reply speed, approval cards inline, resolved tool calls collapsed ("Allowed by you"), a small "Saved to memory: …" note whenever Riz saves a fact (links to the Memory page).

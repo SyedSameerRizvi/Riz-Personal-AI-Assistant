@@ -1,8 +1,8 @@
 import { Menu } from 'lucide-react'
 import { useCallback, useEffect, useLayoutEffect, useReducer, useRef } from 'react'
+import { ThinkingOrb } from 'thinking-orbs'
 import { ApprovalCard } from '@/components/ApprovalCard'
 import { Composer } from '@/components/Composer'
-import { Logo } from '@/components/Logo'
 import { MemoryNote } from '@/components/MemoryNote'
 import { AssistantRow, AssistantText, ReplyActions, UserMessage } from '@/components/Message'
 import { ToolChip } from '@/components/ToolChip'
@@ -160,8 +160,8 @@ export function ChatView(props: ChatViewProps) {
               ),
             )}
             {waiting && (
-              <AssistantRow>
-                <span className="riz-caret mt-1 text-sm text-faint" aria-label="Riz is thinking" />
+              <AssistantRow activity="thinking">
+                <span className="mt-1 text-sm text-faint">Thinking…</span>
               </AssistantRow>
             )}
             {state.pending && (
@@ -205,7 +205,11 @@ function Turn({
     .join('\n\n')
   const lastText = items.findLastIndex((i) => i.kind === 'assistant')
   return (
-    <AssistantRow>
+    <AssistantRow
+      activity={
+        streaming ? (items.at(-1)?.kind === 'assistant' ? 'responding' : 'thinking') : undefined
+      }
+    >
       {items.map((item, i) => {
         if (item.kind === 'assistant')
           return <AssistantText key={i} text={item.text} streaming={streaming && i === lastText} />
@@ -229,8 +233,8 @@ function Turn({
 function EmptyState() {
   return (
     <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
-      <Logo size={44} />
-      <h2 className="text-xl font-semibold">How can I help?</h2>
+      <ThinkingOrb state="weaving" size={64} aria-label="Riz is ready" />
+      <h2 className="font-display text-[40px] leading-[1.1]">How can I help?</h2>
       <p className="max-w-sm text-sm text-muted-foreground">
         Ask anything. Riz can also read and change files or run commands on this PC, and asks you
         first every time.

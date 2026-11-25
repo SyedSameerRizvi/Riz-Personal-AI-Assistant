@@ -106,7 +106,7 @@ export function Dashboard({ settings, status }: { settings: Settings | null; sta
       <div className="mx-auto flex max-w-[1200px] flex-col gap-5 px-4 py-7 sm:px-8">
         <div className="flex flex-wrap items-center gap-3">
           <div className="grow">
-            <h1 className="text-[22px] font-semibold">Dashboard</h1>
+            <h1 className="font-display text-[38px] leading-[1.1]">Dashboard</h1>
             <p className="mt-1 text-sm text-muted-foreground">
               {totals
                 ? `${RANGE_LABEL[range]}: ${totals.messages} ${totals.messages === 1 ? 'message' : 'messages'} across ${totals.chats} ${totals.chats === 1 ? 'chat' : 'chats'}`
@@ -247,7 +247,7 @@ export function Dashboard({ settings, status }: { settings: Settings | null; sta
               title="Generation speed"
               subtitle={
                 <>
-                  <span className="text-[22px] font-semibold text-foreground">
+                  <span className="font-display text-[30px] leading-none text-foreground">
                     {avgSpeed != null ? avgSpeed.toFixed(1) : '–'}
                   </span>{' '}
                   tok/s average

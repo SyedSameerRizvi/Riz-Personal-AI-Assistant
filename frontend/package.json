@@ -11,6 +11,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@fontsource/cormorant-garamond": "^5.3.0",
     "@fontsource/inter": "^5.3.0",
     "@fontsource/jetbrains-mono": "^5.3.0",
     "@radix-ui/react-alert-dialog": "^1.2.1",
@@ -30,7 +31,8 @@
     "recharts": "^3.11.1",
     "rehype-highlight": "^7.0.2",
     "tailwind-merge": "^3.7.1",
-    "tailwindcss": "^4.3.5"
+    "tailwindcss": "^4.3.5",
+    "thinking-orbs": "^0.3.2"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^8.0.0",

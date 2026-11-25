@@ -3,7 +3,7 @@ import { type ComponentProps, isValidElement, type ReactElement, useRef } from '
 import ReactMarkdown from 'react-markdown'
 import rehypeHighlight from 'rehype-highlight'
 import { CopyButton } from '@/components/CopyButton'
-import { Logo } from '@/components/Logo'
+import { type Activity, RizAvatar } from '@/components/RizAvatar'
 import { Tooltip } from '@/components/ui/tooltip'
 import type { Stats } from '@/lib/types'
 import { cn } from '@/lib/utils'
@@ -16,10 +16,16 @@ export function UserMessage({ text }: { text: string }) {
   )
 }
 
-export function AssistantRow({ children }: { children: React.ReactNode }) {
+export function AssistantRow({
+  children,
+  activity,
+}: {
+  children: React.ReactNode
+  activity?: Activity
+}) {
   return (
     <div className="flex gap-3">
-      <Logo />
+      <RizAvatar activity={activity} />
       <div className="flex min-w-0 grow flex-col gap-3">{children}</div>
     </div>
   )
@@ -31,8 +37,8 @@ function CodeBlock(props: ComponentProps<'pre'>) {
   const className = isValidElement(child) ? (child.props.className ?? '') : ''
   const language = /language-([\w-]+)/.exec(className)?.[1] ?? 'text'
   return (
-    <div className="my-3 overflow-hidden rounded-xl border border-border">
-      <div className="flex h-9 items-center border-b border-border bg-panel pr-1.5 pl-3.5 text-xs text-muted-foreground">
+    <div className="my-3 overflow-hidden rounded-xl bg-code">
+      <div className="flex h-9 items-center bg-code-head pr-1.5 pl-3.5 font-mono text-xs text-[#aca796] [&_button]:text-[#aca796] [&_button:hover]:bg-white/10 [&_button:hover]:text-[#f2eee2]">
         <span className="grow">{language}</span>
         <CopyButton showText label="Copy code" getText={() => ref.current?.innerText ?? ''} />
       </div>
@@ -64,7 +70,6 @@ export function AssistantText({ text, streaming }: { text: string; streaming?: b
   return (
     <div className={cn('prose-riz', streaming && 'riz-streaming')}>
       <Markdown text={text} />
-      {streaming && <span className="riz-caret" aria-hidden="true" />}
     </div>
   )
 }

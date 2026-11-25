@@ -61,7 +61,7 @@ export function Memory({ chats }: { chats: Chat[] }) {
       <div className="mx-auto flex max-w-[820px] flex-col gap-5 px-4 py-7 sm:px-8">
         <div className="flex flex-wrap items-end gap-3">
           <div className="grow">
-            <h1 className="text-[22px] font-semibold">Memory</h1>
+            <h1 className="font-display text-[38px] leading-[1.1]">Memory</h1>
             <p className="mt-1 text-sm text-muted-foreground">
               Facts Riz saved about you. It recalls them to tailor its answers.
             </p>

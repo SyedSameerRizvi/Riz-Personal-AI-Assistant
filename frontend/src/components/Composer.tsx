@@ -87,7 +87,7 @@ export function Composer({ busy, pending, hotkey, onSend, onStop }: ComposerProp
                 aria-label="Send message"
                 onClick={submit}
                 disabled={!text.trim() || pending}
-                className="flex size-10 cursor-pointer items-center justify-center rounded-[10px] bg-primary text-primary-foreground transition-opacity disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex size-10 cursor-pointer items-center justify-center rounded-lg bg-primary text-primary-foreground transition-opacity disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <ArrowUp className="size-[18px]" strokeWidth={2.2} aria-hidden="true" />
               </button>

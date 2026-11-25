@@ -25,6 +25,7 @@ Riz is a desktop chat assistant that can read, write and delete files and run Po
 - **Usage dashboard.** Tokens per day, generation speed over time, tool calls with approval rates, GPU memory and Ollama status.
 - **Lives in the tray.** Starts with Windows, and `Ctrl+Space` shows or hides the window from anywhere.
 - **Dark and light themes** that follow Windows.
+- **Live thinking orbs.** A dotted orb animates while Riz thinks and while it writes, using [thinking-orbs](https://github.com/Jakubantalik/thinking-orbs) by Jakub Antalik (MIT).
 
 | Dashboard | Memory |
 |---|---|
