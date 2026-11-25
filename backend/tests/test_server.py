@@ -101,3 +101,19 @@ def test_stats_and_status_routes(tmp_path, monkeypatch):
         assert len(c.get("/api/stats", params={"range": "30d"}).json()["tokens_per_day"]) == 30
         assert c.get("/api/stats", params={"range": "1y"}).status_code == 422
         assert c.get("/api/status").json()["ollama"] is False
+
+
+def test_ws_allow_runs_tool_and_logs(tmp_path):
+    note = tmp_path / "note.txt"
+    note.write_text("hello")
+    script = [ai_call("read_file", {"path": str(note)}, "1"), AIMessage("It says hello")]
+    with client_with(tmp_path, script) as c:
+        chat = c.post("/api/chats", json={}).json()
+        with c.websocket_connect("/ws") as ws:
+            ws.send_json({"type": "send", "chat_id": chat["id"], "text": "read it"})
+            receive_until(ws, {"tool_request"})
+            ws.send_json({"type": "approve", "chat_id": chat["id"], "decision": "allow"})
+            events = receive_until(ws, {"done", "error"})
+        assert events[0]["summary"] == "hello" and events[-1]["type"] == "done"
+        tools = c.get("/api/stats", params={"range": "7d"}).json()["tools"]
+        assert tools == [{"tool": "read_file", "allowed": 1, "denied": 0, "auto": 0}]

@@ -118,9 +118,9 @@ async def _run_tool(conn: sqlite3.Connection, name: str, args: dict, chat_id: st
     try:
         match name:
             case "recall_memory":
-                return _recall(conn, args["query"])
+                return await asyncio.to_thread(_recall, conn, args["query"])
             case "save_memory":
-                return _save(conn, args["text"], args["kind"], chat_id)
+                return await asyncio.to_thread(_save, conn, args["text"], args["kind"], chat_id)
             case "read_file":
                 return await asyncio.to_thread(tools.read_file, args["path"])
             case "write_file":
@@ -135,6 +135,11 @@ async def _run_tool(conn: sqlite3.Connection, name: str, args: dict, chat_id: st
         return f"Missing argument {e} for {name}"
 
 
+# SQLite calls inside the graph run in a worker thread. The checkpointer writes to the same
+# file through aiosqlite on this event loop, so a blocking call here could wait on a lock
+# that only this loop can release.
+
+
 def build_graph(model: BaseChatModel, conn: sqlite3.Connection, checkpointer):
     bound = model.bind_tools(make_tools(conn))
 
@@ -146,7 +151,8 @@ def build_graph(model: BaseChatModel, conn: sqlite3.Connection, checkpointer):
             strategy="last",
             start_on="human",
         )
-        system = SystemMessage(build_system_prompt(list_memories(conn), date.today()))
+        memories = await asyncio.to_thread(list_memories, conn)
+        system = SystemMessage(build_system_prompt(memories, date.today()))
         return {"messages": [await bound.ainvoke([system, *history])]}
 
     async def tools_node(state: MessagesState, config: RunnableConfig) -> dict:
@@ -162,7 +168,7 @@ def build_graph(model: BaseChatModel, conn: sqlite3.Connection, checkpointer):
                 content = DENIED
             else:
                 content = await _run_tool(conn, c["name"], args, chat_id)
-            log_tool_call(conn, chat_id, c["name"], args, outcome)
+            await asyncio.to_thread(log_tool_call, conn, chat_id, c["name"], args, outcome)
             results.append(
                 ToolMessage(
                     content,

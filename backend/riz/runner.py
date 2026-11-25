@@ -1,5 +1,6 @@
 """Drives the agent graph for one chat and turns it into UI events."""
 
+import asyncio
 import re
 import sqlite3
 import time
@@ -91,10 +92,11 @@ class ChatRunner:
         if await self.pending(chat_id):
             yield {"type": "error", "chat_id": chat_id, "message": PENDING}
             return
-        chat = get_chat(self.conn, chat_id)
+        chat = await asyncio.to_thread(get_chat, self.conn, chat_id)
         if chat and chat["title"] == "New chat":
-            rename_chat(self.conn, chat_id, text.strip()[:TITLE_CHARS] or "New chat")
-        touch_chat(self.conn, chat_id)
+            title = text.strip()[:TITLE_CHARS] or "New chat"
+            await asyncio.to_thread(rename_chat, self.conn, chat_id, title)
+        await asyncio.to_thread(touch_chat, self.conn, chat_id)
         async for e in self._stream(chat_id, {"messages": [HumanMessage(text)]}):
             yield e
 
@@ -106,7 +108,7 @@ class ChatRunner:
                 "message": "Nothing is waiting for approval.",
             }
             return
-        touch_chat(self.conn, chat_id)
+        await asyncio.to_thread(touch_chat, self.conn, chat_id)
         async for e in self._stream(chat_id, Command(resume=decision)):
             yield e
 
@@ -190,7 +192,8 @@ class ChatRunner:
                 if chunk.usage_metadata:
                     total_ms = max(1, int((time.perf_counter() - started) * 1000))
                     out_tokens = chunk.usage_metadata.get("output_tokens", 0)
-                    log_model_call(
+                    await asyncio.to_thread(
+                        log_model_call,
                         self.conn,
                         chat_id,
                         self.model_name,

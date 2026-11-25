@@ -86,7 +86,7 @@ def create_app(data_dir: Path, model: BaseChatModel | None = None) -> FastAPI:
 
     @app.delete("/api/chats/{chat_id}")
     async def delete_chat(chat_id: str):
-        db.delete_chat(conn(), chat_id)
+        await asyncio.to_thread(db.delete_chat, conn(), chat_id)
         await app.state.saver.adelete_thread(chat_id)
         return {"ok": True}
 
