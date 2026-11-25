@@ -2,6 +2,7 @@
 
 import asyncio
 import contextlib
+import os
 from contextlib import asynccontextmanager
 from datetime import date
 from pathlib import Path
@@ -14,7 +15,7 @@ from langchain_ollama import ChatOllama
 from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
 from pydantic import BaseModel
 
-from riz import db, stats
+from riz import db, startup, stats
 from riz.agent import build_graph
 from riz.runner import ChatRunner
 
@@ -133,6 +134,10 @@ def create_app(data_dir: Path, model: BaseChatModel | None = None) -> FastAPI:
             db.update_settings(conn(), values)
         except KeyError as e:
             raise HTTPException(400, str(e.args[0])) from None
+        if "start_with_windows" in values and os.name == "nt":
+            startup.set_start_with_windows(
+                values["start_with_windows"] == "true", startup.pythonw_exe()
+            )
         return db.get_settings(conn())
 
     # Dashboard
