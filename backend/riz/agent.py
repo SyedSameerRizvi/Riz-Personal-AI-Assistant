@@ -168,13 +168,13 @@ def build_graph(model: BaseChatModel, conn: sqlite3.Connection, checkpointer):
                     content,
                     tool_call_id=c["id"],
                     name=c["name"],
-                    additional_kwargs={"decision": outcome},
+                    additional_kwargs={"decision": outcome, "args": args},
                 )
             )
         return {"messages": results}
 
     def route(state: MessagesState) -> str:
-        last = state["messages"][-1]
+        last = state["messages"][-1] if state["messages"] else None
         return "tools" if isinstance(last, AIMessage) and last.tool_calls else END
 
     graph = StateGraph(MessagesState)
