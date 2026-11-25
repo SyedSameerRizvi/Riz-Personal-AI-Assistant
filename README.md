@@ -79,10 +79,8 @@ The full design is in [`docs/spec.md`](docs/spec.md).
 - Windows 10 or 11
 - An NVIDIA GPU with 6 GB of VRAM or more (built on a GTX 1660 Super)
 - [Ollama](https://ollama.com)
-- Python 3.12
-- Node 22 (the test tools need it; Node 20 reached end of life in April 2026)
 
-## Setup
+## Install
 
 1. Install Ollama and download the model. To keep models off a small system drive, set `OLLAMA_MODELS` first (for example `F:\ollama-models`) and restart Ollama.
 
@@ -90,7 +88,15 @@ The full design is in [`docs/spec.md`](docs/spec.md).
    ollama pull qwen3:8b
    ```
 
-2. Install the backend.
+2. Download **Riz-Setup.exe** from the [latest release](https://github.com/SyedSameerRizvi/Riz-Personal-AI-Assistant/releases/latest) and run it. It installs Riz for your user account (no admin rights needed) and adds Start menu and desktop shortcuts. A portable `Riz-portable.zip` is there too if you'd rather not install.
+
+The first launch adds Riz to your Startup folder so it starts with Windows (hidden in the tray). You can turn that off in **Settings**. Closing the window hides it to the tray; use the tray menu's **Quit** to exit. Your chats and memory live in `%APPDATA%\Riz`.
+
+## Run from source
+
+Needs Python 3.12 and Node 22 as well.
+
+1. Install the backend.
 
    ```powershell
    cd backend
@@ -99,7 +105,7 @@ The full design is in [`docs/spec.md`](docs/spec.md).
    pip install -e ".[dev]"
    ```
 
-3. Build the frontend.
+2. Build the frontend.
 
    ```powershell
    cd frontend
@@ -107,15 +113,13 @@ The full design is in [`docs/spec.md`](docs/spec.md).
    npm run build
    ```
 
-## Run
+3. Start Riz.
 
 ```powershell
 cd backend
 .venv\Scripts\activate
 python -m riz
 ```
-
-The first launch adds a shortcut to your Startup folder so Riz starts with Windows (hidden in the tray). You can turn that off in **Settings**. Closing the window hides it to the tray; use the tray menu's **Quit** to exit.
 
 ### Development
 
@@ -130,6 +134,10 @@ uvicorn riz.server:dev_app --factory --reload --port 8765
 cd frontend
 npm run dev
 ```
+
+### Build the installer
+
+The [Build Riz.exe](.github/workflows/release.yml) workflow packages the app with PyInstaller and Inno Setup on every `v*` tag and attaches `Riz-Setup.exe` to the release. To build locally on Windows: `npm run build` in `frontend`, then `pyinstaller packaging/riz.spec` in `backend`.
 
 ## Tests
 
