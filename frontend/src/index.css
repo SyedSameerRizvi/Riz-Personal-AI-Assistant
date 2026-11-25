@@ -1,0 +1,248 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --bg: #ffffff;
+  --panel: #f6f7f9;
+  --raised: #eef0f4;
+  --line: #e3e6eb;
+  --text: #16181d;
+  --muted-text: #545b68;
+  --faint: #646b78;
+  --accent-c: #4f5bd5;
+  --accent-ink: #ffffff;
+  --ok: #1a7f45;
+  --warn-bg: #fff4dd;
+  --warn-text: #8a5a00;
+  --code: #f6f7f9;
+  --code-text: #1f2328;
+  --danger: #c4314b;
+  --chart-a: #4f5bd5;
+  --chart-b: #b0601c;
+  --chart-grid: #e3e6eb;
+  color-scheme: light;
+}
+
+.dark {
+  --bg: #0e1014;
+  --panel: #15181e;
+  --raised: #232833;
+  --line: #262b35;
+  --text: #e6e8ec;
+  --muted-text: #a0a6b1;
+  --faint: #868d9a;
+  --accent-c: #8b97ff;
+  --accent-ink: #0e1014;
+  --ok: #5fd38d;
+  --warn-bg: #3a2c12;
+  --warn-text: #f2b65a;
+  --code: #0a0c10;
+  --code-text: #d5d8de;
+  --danger: #ff8597;
+  --chart-a: #7c88f5;
+  --chart-b: #c77a35;
+  --chart-grid: #262b35;
+  color-scheme: dark;
+}
+
+/* shadcn token names mapped onto the Riz palette */
+@theme inline {
+  --color-background: var(--bg);
+  --color-foreground: var(--text);
+  --color-card: var(--panel);
+  --color-card-foreground: var(--text);
+  --color-popover: var(--panel);
+  --color-popover-foreground: var(--text);
+  --color-primary: var(--accent-c);
+  --color-primary-foreground: var(--accent-ink);
+  --color-secondary: var(--raised);
+  --color-secondary-foreground: var(--text);
+  --color-muted: var(--raised);
+  --color-muted-foreground: var(--muted-text);
+  --color-accent: var(--raised);
+  --color-accent-foreground: var(--text);
+  --color-destructive: var(--danger);
+  --color-border: var(--line);
+  --color-input: var(--line);
+  --color-ring: var(--accent-c);
+  --color-panel: var(--panel);
+  --color-raised: var(--raised);
+  --color-faint: var(--faint);
+  --color-ok: var(--ok);
+  --color-warn: var(--warn-bg);
+  --color-warn-foreground: var(--warn-text);
+  --color-code: var(--code);
+  --color-code-foreground: var(--code-text);
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  border-color: var(--line);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent-c);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent-c) 30%, transparent);
+}
+
+/* scrollbars that stay out of the way */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--raised) transparent;
+}
+
+/* markdown in replies */
+.prose-riz {
+  font-size: 15px;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+.prose-riz > :first-child {
+  margin-top: 0;
+}
+.prose-riz > :last-child {
+  margin-bottom: 0;
+}
+.prose-riz p,
+.prose-riz ul,
+.prose-riz ol,
+.prose-riz blockquote,
+.prose-riz table {
+  margin: 0 0 12px;
+}
+.prose-riz ul {
+  list-style: disc;
+  padding-left: 22px;
+}
+.prose-riz ol {
+  list-style: decimal;
+  padding-left: 22px;
+}
+.prose-riz li + li {
+  margin-top: 4px;
+}
+.prose-riz h1,
+.prose-riz h2,
+.prose-riz h3 {
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 18px 0 8px;
+}
+.prose-riz h1 {
+  font-size: 20px;
+}
+.prose-riz h2 {
+  font-size: 17px;
+}
+.prose-riz h3 {
+  font-size: 15px;
+}
+.prose-riz a {
+  color: var(--accent-c);
+  text-decoration: underline;
+}
+.prose-riz strong {
+  font-weight: 600;
+}
+.prose-riz blockquote {
+  border-left: 3px solid var(--line);
+  padding-left: 12px;
+  color: var(--muted-text);
+}
+.prose-riz :not(pre) > code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--raised);
+  border-radius: 5px;
+  padding: 1px 5px;
+}
+.prose-riz table {
+  border-collapse: collapse;
+  display: block;
+  overflow-x: auto;
+}
+.prose-riz th,
+.prose-riz td {
+  border: 1px solid var(--line);
+  padding: 6px 10px;
+  text-align: left;
+}
+
+/* highlight.js colours on the Riz palette */
+.hljs {
+  color: var(--code-text);
+}
+.hljs-comment,
+.hljs-quote,
+.hljs-meta {
+  color: var(--faint);
+  font-style: italic;
+}
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-built_in,
+.hljs-section,
+.hljs-name {
+  color: var(--accent-c);
+}
+.hljs-string,
+.hljs-attr,
+.hljs-template-tag,
+.hljs-addition {
+  color: var(--ok);
+}
+.hljs-number,
+.hljs-literal,
+.hljs-symbol,
+.hljs-variable,
+.hljs-title,
+.hljs-type {
+  color: var(--warn-text);
+}
+.hljs-deletion {
+  color: var(--danger);
+}
+
+@keyframes riz-blink {
+  50% {
+    opacity: 0;
+  }
+}
+.riz-caret::after {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 1.1em;
+  margin-left: 2px;
+  vertical-align: -0.2em;
+  background: var(--accent-c);
+  animation: riz-blink 1s step-end infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .riz-caret::after {
+    animation: none;
+  }
+}
