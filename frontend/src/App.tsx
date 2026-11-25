@@ -3,6 +3,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ChatView } from '@/components/ChatView'
 import { Sidebar, type View } from '@/components/Sidebar'
 import { Dashboard } from '@/pages/Dashboard'
+import { Memory } from '@/pages/Memory'
+import { Settings as SettingsPage } from '@/pages/Settings'
 import { Button } from '@/components/ui/button'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import * as api from '@/lib/api'
@@ -169,10 +171,13 @@ export default function App() {
             />
           ) : view === 'dashboard' ? (
             <Dashboard settings={settings} status={status} />
+          ) : view === 'memory' ? (
+            <Memory chats={chats} />
           ) : (
-            <div className="flex min-h-0 grow flex-col">
-              <p className="m-auto text-sm text-muted-foreground">{view} page</p>
-            </div>
+            <SettingsPage
+              settings={settings}
+              onChange={async (values) => setSettings(await api.updateSettings(values))}
+            />
           )}
         </main>
       </div>
