@@ -163,6 +163,7 @@ export default function App() {
               title={activeTitle}
               model={settings?.model}
               hotkey={settings?.hotkey}
+              userName={settings?.user_name}
               send={send}
               subscribe={subscribe}
               createChat={createChat}

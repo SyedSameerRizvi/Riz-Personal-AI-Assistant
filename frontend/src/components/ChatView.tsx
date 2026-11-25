@@ -16,6 +16,7 @@ interface ChatViewProps {
   title: string
   model?: string
   hotkey?: string
+  userName?: string
   send: (m: ClientMessage) => void
   subscribe: (fn: (e: ServerEvent) => void) => () => void
   createChat: () => Promise<string>
@@ -141,7 +142,7 @@ export function ChatView(props: ChatViewProps) {
         aria-live="polite"
       >
         {state.items.length === 0 && !state.pending ? (
-          <EmptyState />
+          <EmptyState name={props.userName} />
         ) : (
           <div className="mx-auto flex max-w-[740px] flex-col gap-[22px]">
             {blocks.map((block, i) =>
@@ -230,11 +231,17 @@ function Turn({
 }
 
 
-function EmptyState() {
+function greeting(name?: string) {
+  const hour = new Date().getHours()
+  const part = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
+  return name?.trim() ? `${part}, ${name.trim()}` : 'How can I help?'
+}
+
+function EmptyState({ name }: { name?: string }) {
   return (
     <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
       <ThinkingOrb state="weaving" size={64} aria-label="Riz is ready" />
-      <h2 className="font-display text-[40px] leading-[1.1]">How can I help?</h2>
+      <h2 className="font-display text-[40px] leading-[1.1]">{greeting(name)}</h2>
       <p className="max-w-sm text-sm text-muted-foreground">
         Ask anything. Riz can also read and change files or run commands on this PC, and asks you
         first every time.

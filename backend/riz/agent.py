@@ -18,7 +18,7 @@ from langgraph.graph import END, START, MessagesState, StateGraph
 from langgraph.types import interrupt
 
 from riz import tools
-from riz.db import add_memory, list_memories, log_tool_call, search_memories
+from riz.db import add_memory, get_settings, list_memories, log_tool_call, search_memories
 
 APPROVAL_TOOLS = {"read_file", "write_file", "delete_file", "run_command"}
 DENIED = "The user denied this action."
@@ -79,9 +79,10 @@ def make_tools(conn: sqlite3.Connection) -> list[BaseTool]:
     return [recall_memory, save_memory, read_file, write_file, delete_file, run_command]
 
 
-def build_system_prompt(memories: list[dict], today: date) -> str:
+def build_system_prompt(memories: list[dict], today: date, user_name: str = "") -> str:
     lines = [
         "You are Riz, a personal AI assistant running locally on the user's Windows PC.",
+        *([f"The user's name is {user_name}. Greet them by name."] if user_name else []),
         "You can search and save facts about the user freely.",
         "Reading, writing or deleting files and running PowerShell commands need the user's approval.",
         "If the user denies an action, accept it and continue without it.",
@@ -152,7 +153,10 @@ def build_graph(model: BaseChatModel, conn: sqlite3.Connection, checkpointer):
             start_on="human",
         )
         memories = await asyncio.to_thread(list_memories, conn)
-        system = SystemMessage(build_system_prompt(memories, date.today()))
+        settings = await asyncio.to_thread(get_settings, conn)
+        system = SystemMessage(
+            build_system_prompt(memories, date.today(), settings["user_name"].strip())
+        )
         return {"messages": [await bound.ainvoke([system, *history])]}
 
     async def tools_node(state: MessagesState, config: RunnableConfig) -> dict:

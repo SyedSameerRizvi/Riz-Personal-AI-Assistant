@@ -43,6 +43,9 @@ export function Settings({ settings, onChange }: SettingsProps) {
         )}
 
         <div className="divide-y divide-border rounded-[14px] border border-border">
+          <Row id="user_name" title="Your name" hint="Riz greets you and talks to you by this name." saved={saved === 'user_name'}>
+            <TextSetting id="user_name" value={settings.user_name ?? ''} allowEmpty onCommit={(v) => save('user_name', v)} />
+          </Row>
           <Row
             id="model"
             title="Model"
@@ -130,18 +133,22 @@ function TextSetting({
   id,
   value,
   mono,
+  allowEmpty,
   onCommit,
 }: {
   id: string
   value: string
   mono?: boolean
+  allowEmpty?: boolean
   onCommit: (v: string) => void
 }) {
   const [draft, setDraft] = useState(value)
   useEffect(() => setDraft(value), [value])
   const commit = () => {
     const v = draft.trim()
-    if (v) onCommit(v)
+    if (v || allowEmpty) {
+      if (v !== value) onCommit(v)
+    }
     else setDraft(value)
   }
   return (

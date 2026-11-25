@@ -148,3 +148,9 @@ def test_make_tools_names(conn):
 def test_system_prompt_lists_memories():
     p = build_system_prompt([{"text": "Likes tea"}], date(2026, 11, 25))
     assert "Riz" in p and "Likes tea" in p and "2026-11-25" in p
+    assert "name is" not in p
+
+
+def test_system_prompt_greets_user_by_name():
+    p = build_system_prompt([], date(2026, 11, 25), "Sameer")
+    assert "The user's name is Sameer" in p

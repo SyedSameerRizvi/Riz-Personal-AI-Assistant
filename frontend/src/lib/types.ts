@@ -17,7 +17,7 @@ export interface Memory {
   updated_at?: string
 }
 
-export type Settings = Record<'model' | 'theme' | 'hotkey' | 'start_with_windows', string>
+export type Settings = Record<'user_name' | 'model' | 'theme' | 'hotkey' | 'start_with_windows', string>
 
 export type Decision = 'auto' | 'allowed' | 'denied'
 

@@ -8,6 +8,7 @@ from pathlib import Path
 from uuid import uuid4
 
 DEFAULT_SETTINGS: dict[str, str] = {
+    "user_name": "",
     "model": "qwen3:8b",
     "theme": "system",
     "hotkey": "ctrl+space",
