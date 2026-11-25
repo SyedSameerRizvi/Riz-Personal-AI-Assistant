@@ -1,10 +1,12 @@
 import { Menu } from 'lucide-react'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { ChatView } from '@/components/ChatView'
 import { Sidebar, type View } from '@/components/Sidebar'
 import { Button } from '@/components/ui/button'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import * as api from '@/lib/api'
-import type { Chat, Settings, Status } from '@/lib/types'
+import type { Chat, ClientMessage, ServerEvent, Settings, Status } from '@/lib/types'
+import { type ChatSocket, connect } from '@/lib/ws'
 import { useTheme } from '@/lib/useTheme'
 
 const STATUS_POLL_MS = 10_000
@@ -18,6 +20,22 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useTheme(settings?.theme)
+
+  // One WebSocket for the whole app; views subscribe to its events.
+  const listeners = useRef(new Set<(e: ServerEvent) => void>())
+  const socket = useRef<ChatSocket | null>(null)
+  useEffect(() => {
+    const s = connect((e) => listeners.current.forEach((fn) => fn(e)))
+    socket.current = s
+    return () => s.close()
+  }, [])
+  const send = useCallback((m: ClientMessage) => socket.current?.send(m), [])
+  const subscribe = useCallback((fn: (e: ServerEvent) => void) => {
+    listeners.current.add(fn)
+    return () => {
+      listeners.current.delete(fn)
+    }
+  }, [])
 
   const refreshChats = useCallback(() => {
     api.listChats().then(setChats).catch(() => {})
@@ -40,6 +58,27 @@ export default function App() {
     setView('chat')
     setSidebarOpen(false)
   }, [])
+
+  // Titles change after the first message, and order changes with activity.
+  useEffect(
+    () =>
+      subscribe((e) => {
+        if (e.type === 'done' || e.type === 'tool_request' || e.type === 'error') refreshChats()
+      }),
+    [subscribe, refreshChats],
+  )
+
+  const createChat = useCallback(async () => {
+    const chat = await api.createChat()
+    setActiveChatId(chat.id)
+    refreshChats()
+    return chat.id
+  }, [refreshChats])
+
+  const activeTitle = useMemo(
+    () => chats.find((c) => c.id === activeChatId)?.title ?? 'New chat',
+    [chats, activeChatId],
+  )
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -113,11 +152,22 @@ export default function App() {
             </Button>
             <span className="text-[15px] font-semibold">Riz</span>
           </div>
-          <div className="flex min-h-0 grow flex-col">
-            <p className="m-auto text-sm text-muted-foreground">
-              {view === 'chat' ? 'Chat view comes next.' : `${view} page`}
-            </p>
-          </div>
+          {view === 'chat' ? (
+            <ChatView
+              chatId={activeChatId}
+              title={activeTitle}
+              model={settings?.model}
+              hotkey={settings?.hotkey}
+              send={send}
+              subscribe={subscribe}
+              createChat={createChat}
+              onOpenMemory={() => setView('memory')}
+            />
+          ) : (
+            <div className="flex min-h-0 grow flex-col">
+              <p className="m-auto text-sm text-muted-foreground">{view} page</p>
+            </div>
+          )}
         </main>
       </div>
     </TooltipProvider>
