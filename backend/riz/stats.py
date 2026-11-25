@@ -23,7 +23,8 @@ def get_stats(conn: sqlite3.Connection, range_: Literal["7d", "30d", "all"], tod
                sum(input_tokens) AS input, sum(output_tokens) AS output,
                sum(CASE WHEN first_token_ms IS NOT NULL THEN output_tokens END) AS gen_tokens,
                sum(total_ms - first_token_ms) AS gen_ms,
-               avg(first_token_ms) AS first_token_ms
+               avg(first_token_ms) AS first_token_ms,
+               count(*) AS messages, count(DISTINCT chat_id) AS chats
         FROM model_calls WHERE date(started_at, 'localtime') >= ?
         GROUP BY day ORDER BY day
         """,
@@ -40,7 +41,13 @@ def get_stats(conn: sqlite3.Connection, range_: Literal["7d", "30d", "all"], tod
     for d in day_list:
         r = by_day.get(d)
         tokens.append(
-            {"day": d, "input": r["input"] if r else 0, "output": r["output"] if r else 0}
+            {
+                "day": d,
+                "input": r["input"] if r else 0,
+                "output": r["output"] if r else 0,
+                "messages": r["messages"] if r else 0,
+                "chats": r["chats"] if r else 0,
+            }
         )
         tok_per_s = None
         if r and r["gen_ms"]:

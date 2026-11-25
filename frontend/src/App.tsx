@@ -2,6 +2,7 @@ import { Menu } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { ChatView } from '@/components/ChatView'
 import { Sidebar, type View } from '@/components/Sidebar'
+import { Dashboard } from '@/pages/Dashboard'
 import { Button } from '@/components/ui/button'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import * as api from '@/lib/api'
@@ -166,6 +167,8 @@ export default function App() {
               onOpenMemory={() => setView('memory')}
               onOpenSidebar={() => setSidebarOpen(true)}
             />
+          ) : view === 'dashboard' ? (
+            <Dashboard settings={settings} status={status} />
           ) : (
             <div className="flex min-h-0 grow flex-col">
               <p className="m-auto text-sm text-muted-foreground">{view} page</p>

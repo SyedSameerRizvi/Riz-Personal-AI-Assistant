@@ -68,7 +68,7 @@ export type ClientMessage =
 export type Range = '7d' | '30d' | 'all'
 
 export interface DashboardStats {
-  tokens_per_day: { day: string; input: number; output: number }[]
+  tokens_per_day: { day: string; input: number; output: number; messages: number; chats: number }[]
   speed: { day: string; tok_per_s: number | null; first_token_ms: number | null }[]
   tools: { tool: string; allowed: number; denied: number; auto: number }[]
   totals: { messages: number; chats: number }

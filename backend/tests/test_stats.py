@@ -13,7 +13,13 @@ def test_tokens_zero_filled_7d(conn):
     assert len(days) == 7
     assert days[0]["day"] == (today - timedelta(days=6)).isoformat()
     assert days[0]["input"] == 0
-    assert days[-1] == {"day": today.isoformat(), "input": 10, "output": 5}
+    assert days[-1] == {
+        "day": today.isoformat(),
+        "input": 10,
+        "output": 5,
+        "messages": 1,
+        "chats": 1,
+    }
 
 
 def test_speed_formula(conn):
@@ -38,7 +44,7 @@ def test_tool_counts(conn):
 def test_all_range_lists_only_days_with_data(conn):
     log_model_call(conn, "c1", "m", 3, 4, 10, 100)
     assert get_stats(conn, "all", date.today())["tokens_per_day"] == [
-        {"day": date.today().isoformat(), "input": 3, "output": 4}
+        {"day": date.today().isoformat(), "input": 3, "output": 4, "messages": 1, "chats": 1}
     ]
 
 
