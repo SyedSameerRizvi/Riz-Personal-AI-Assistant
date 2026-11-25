@@ -1,0 +1,75 @@
+name: Build Riz.exe
+
+on:
+  push:
+    tags: ["v*"]
+    branches: [feat/windows-exe]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Build frontend
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install backend and PyInstaller
+        run: pip install -e backend pyinstaller
+
+      - name: Build Riz.exe
+        working-directory: backend
+        run: pyinstaller packaging/riz.spec --noconfirm
+
+      - name: Smoke test the packaged app
+        working-directory: backend
+        shell: pwsh
+        run: |
+          $p = Start-Process dist\Riz\Riz.exe -ArgumentList "--smoke-test" -Wait -PassThru
+          if ($p.ExitCode -ne 0) { throw "Smoke test failed with exit code $($p.ExitCode)" }
+
+      - name: Build installer
+        working-directory: backend/packaging
+        shell: pwsh
+        run: |
+          $version = if ("${{ github.ref_type }}" -eq "tag") { "${{ github.ref_name }}".TrimStart("v") } else { "0.0.0-dev" }
+          if (-not (Get-Command iscc -ErrorAction SilentlyContinue)) {
+            choco install innosetup -y --no-progress
+            $env:Path += ";C:\Program Files (x86)\Inno Setup 6"
+          }
+          iscc /DAppVersion=$version /O"..\dist" riz.iss
+
+      - name: Zip portable build
+        working-directory: backend/dist
+        shell: pwsh
+        run: Compress-Archive -Path Riz -DestinationPath Riz-portable.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Riz-windows
+          path: |
+            backend/dist/Riz-Setup.exe
+            backend/dist/Riz-portable.zip
+
+      - name: Publish release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            backend/dist/Riz-Setup.exe
+            backend/dist/Riz-portable.zip

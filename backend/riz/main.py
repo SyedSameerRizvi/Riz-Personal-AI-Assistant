@@ -21,19 +21,19 @@ def _free_port() -> int:
         return s.getsockname()[1]
 
 
-def _tray_image():
-    """The Riz mark: a periwinkle rounded square with a small sun."""
+def _tray_image(size: int = 64):
+    """The Riz mark: a yellow rounded square with a small black sun."""
     from PIL import Image, ImageDraw
 
-    size = 64
+    k = size / 64
     img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
-    d.rounded_rectangle((0, 0, size - 1, size - 1), radius=16, fill="#8B97FF")
-    ink = "#0E1014"
-    c = size / 2
-    d.ellipse((c - 10, c - 10, c + 10, c + 10), outline=ink, width=5)
-    for x1, y1, x2, y2 in [(c, 8, c, 18), (c, 46, c, 56), (8, c, 18, c), (46, c, 56, c)]:
-        d.line((x1, y1, x2, y2), fill=ink, width=5)
+    d.rounded_rectangle((0, 0, size - 1, size - 1), radius=16 * k, fill="#F5C518")
+    ink = "#0D0D0B"
+    w = max(1, round(5 * k))
+    d.ellipse((22 * k, 22 * k, 42 * k, 42 * k), outline=ink, width=w)
+    for x1, y1, x2, y2 in [(32, 8, 32, 18), (32, 46, 32, 56), (8, 32, 18, 32), (46, 32, 56, 32)]:
+        d.line((x1 * k, y1 * k, x2 * k, y2 * k), fill=ink, width=w)
     return img
 
 
@@ -44,12 +44,15 @@ def run() -> None:
 
     start_hidden = "--tray" in sys.argv
     folder = data_dir()
+    if sys.stderr is None:  # windowed Riz.exe has no console; keep logs in the data folder
+        log = open(folder / "riz.log", "a", encoding="utf-8", buffering=1)  # noqa: SIM115
+        sys.stdout = sys.stderr = log
     conn = connect(folder / "riz.db")
     settings = get_settings(conn)
     marker = folder / FIRST_RUN_MARKER
     if not marker.exists():
         startup.set_start_with_windows(
-            settings["start_with_windows"] == "true", startup.pythonw_exe()
+            settings["start_with_windows"] == "true", *startup.launch_target()
         )
         marker.write_text("1")
     conn.close()
@@ -80,7 +83,7 @@ def run() -> None:
         height=800,
         min_size=(900, 600),
         hidden=start_hidden,
-        background_color="#0E1014",
+        background_color="#0D0D0B",
     )
 
     def show():

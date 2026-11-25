@@ -19,16 +19,18 @@ def _ps(value: object) -> str:
     return "'" + str(value).replace("'", "''") + "'"
 
 
-def set_start_with_windows(enabled: bool, python_exe: Path) -> None:
+def set_start_with_windows(
+    enabled: bool, exe: Path, args: str = "-m riz --tray", workdir: Path = BACKEND_DIR
+) -> None:
     lnk = shortcut_path()
     if not enabled:
         lnk.unlink(missing_ok=True)
         return
     script = (
         f"$s = (New-Object -ComObject WScript.Shell).CreateShortcut({_ps(lnk)}); "
-        f"$s.TargetPath = {_ps(python_exe)}; "
-        "$s.Arguments = '-m riz --tray'; "
-        f"$s.WorkingDirectory = {_ps(BACKEND_DIR)}; "
+        f"$s.TargetPath = {_ps(exe)}; "
+        f"$s.Arguments = {_ps(args)}; "
+        f"$s.WorkingDirectory = {_ps(workdir)}; "
         "$s.Description = 'Riz, your local AI assistant'; "
         "$s.Save()"
     )
@@ -46,3 +48,11 @@ def pythonw_exe() -> Path:
     exe = Path(sys.executable)
     windowless = exe.with_name("pythonw.exe")
     return windowless if windowless.exists() else exe
+
+
+def launch_target() -> tuple[Path, str, Path]:
+    """What the startup shortcut runs: Riz.exe when packaged, else pythonw -m riz."""
+    if getattr(sys, "frozen", False):
+        exe = Path(sys.executable)
+        return exe, "--tray", exe.parent
+    return pythonw_exe(), "-m riz --tray", BACKEND_DIR

@@ -3,6 +3,7 @@
 import asyncio
 import contextlib
 import os
+import sys
 from contextlib import asynccontextmanager
 from datetime import date
 from pathlib import Path
@@ -20,7 +21,9 @@ from riz.agent import build_graph
 from riz.runner import ChatRunner
 
 NUM_CTX = 8192
-FRONTEND_DIST = Path(__file__).resolve().parents[2] / "frontend" / "dist"
+# Inside the packaged Riz.exe the built UI sits next to the bundled code.
+_ROOT = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parents[2]))
+FRONTEND_DIST = _ROOT / "frontend" / "dist"
 
 
 class ChatPatch(BaseModel):
@@ -136,7 +139,7 @@ def create_app(data_dir: Path, model: BaseChatModel | None = None) -> FastAPI:
             raise HTTPException(400, str(e.args[0])) from None
         if "start_with_windows" in values and os.name == "nt":
             startup.set_start_with_windows(
-                values["start_with_windows"] == "true", startup.pythonw_exe()
+                values["start_with_windows"] == "true", *startup.launch_target()
             )
         return db.get_settings(conn())
 
