@@ -3,6 +3,7 @@
 import asyncio
 import contextlib
 from contextlib import asynccontextmanager
+from datetime import date
 from pathlib import Path
 from typing import Literal
 
@@ -13,7 +14,7 @@ from langchain_ollama import ChatOllama
 from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
 from pydantic import BaseModel
 
-from riz import db
+from riz import db, stats
 from riz.agent import build_graph
 from riz.runner import ChatRunner
 
@@ -133,6 +134,16 @@ def create_app(data_dir: Path, model: BaseChatModel | None = None) -> FastAPI:
         except KeyError as e:
             raise HTTPException(400, str(e.args[0])) from None
         return db.get_settings(conn())
+
+    # Dashboard
+
+    @app.get("/api/stats")
+    def get_stats(range: Literal["7d", "30d", "all"] = "7d"):
+        return stats.get_stats(conn(), range, date.today())
+
+    @app.get("/api/status")
+    async def get_status():
+        return await stats.get_status(db.get_settings(conn())["model"])
 
     # Chat stream
 

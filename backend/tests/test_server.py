@@ -90,3 +90,14 @@ def test_pending_survives_app_restart(tmp_path):
             receive_until(ws, {"tool_request"})
     with client_with(tmp_path) as c:
         assert c.get(f"/api/chats/{chat['id']}/messages").json()["pending"]["tool"] == "read_file"
+
+
+def test_stats_and_status_routes(tmp_path, monkeypatch):
+    async def offline(name):
+        return {"ollama": False, "model": None, "vram_used_gb": None, "vram_total_gb": None}
+
+    monkeypatch.setattr("riz.stats.get_status", offline)
+    with client_with(tmp_path) as c:
+        assert len(c.get("/api/stats", params={"range": "30d"}).json()["tokens_per_day"]) == 30
+        assert c.get("/api/stats", params={"range": "1y"}).status_code == 422
+        assert c.get("/api/status").json()["ollama"] is False

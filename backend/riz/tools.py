@@ -1,6 +1,7 @@
 """Plain tool functions. They return a string for the model and never raise for user errors."""
 
 import difflib
+import os
 import subprocess
 from pathlib import Path
 
@@ -10,6 +11,7 @@ READ_MAX_BYTES = 20_000
 CMD_TIMEOUT_S = 60
 CMD_MAX_CHARS = 10_000
 DIFF_MAX_CHARS = 5_000
+NO_WINDOW = subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0  # no console flash
 
 
 def read_file(path: str, max_bytes: int = READ_MAX_BYTES) -> str:
@@ -86,6 +88,7 @@ def run_command(command: str, timeout: int = CMD_TIMEOUT_S) -> str:
             capture_output=True,
             text=True,
             timeout=timeout,
+            creationflags=NO_WINDOW,
         )
     except subprocess.TimeoutExpired:
         return f"Command timed out after {timeout} s"
