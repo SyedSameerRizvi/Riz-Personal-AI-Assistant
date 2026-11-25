@@ -81,6 +81,7 @@ export function Dashboard({ settings, status }: { settings: Settings | null; sta
   const avgSpeed = speedDays.length
     ? speedDays.reduce((a, d) => a + (d.tok_per_s ?? 0), 0) / speedDays.length
     : null
+  const speedTicks = niceTicks(speedDays.map((d) => d.tok_per_s ?? 0))
   const avgFirst = speedDays.length
     ? speedDays.reduce((a, d) => a + (d.first_token_ms ?? 0), 0) / speedDays.length
     : null
@@ -265,15 +266,15 @@ export function Dashboard({ settings, status }: { settings: Settings | null; sta
               }
             >
               <ResponsiveContainer width="100%" height={220}>
-                <LineChart data={days} margin={{ top: 8, right: 8, left: -18, bottom: 0 }}>
+                <LineChart data={days} margin={{ top: 8, right: 20, left: -18, bottom: 0 }}>
                   <CartesianGrid vertical={false} stroke={colors['chart-grid']} />
                   <XAxis
                     dataKey="label"
                     tickLine={false}
                     axisLine={{ stroke: colors['chart-grid'] }}
                     tick={{ fill: colors['muted-text'], fontSize: 11 }}
-                    interval="preserveStartEnd"
-                    minTickGap={16}
+                    interval={days.length <= 7 ? 0 : 'preserveStartEnd'}
+                    minTickGap={8}
                   />
                   <YAxis
                     tickLine={false}
@@ -281,11 +282,8 @@ export function Dashboard({ settings, status }: { settings: Settings | null; sta
                     tick={{ fill: colors.faint, fontSize: 11 }}
                     width={44}
                     allowDecimals={false}
-                    tickCount={4}
-                    domain={[
-                      (min: number) => Math.max(0, Math.floor(min - 2)),
-                      (max: number) => Math.ceil(max + 2),
-                    ]}
+                    domain={[speedTicks[0], speedTicks[2]]}
+                    ticks={speedTicks}
                   />
                   <Tooltip
                     cursor={{ stroke: colors.faint, strokeWidth: 1 }}
@@ -503,4 +501,14 @@ function ChartTooltip({
       ))}
     </div>
   )
+}
+
+/** Three evenly spaced, round y-axis ticks (step of 5 or more) around the data. */
+function niceTicks(values: number[]): number[] {
+  if (!values.length) return [0, 5, 10]
+  const lo = Math.min(...values)
+  const hi = Math.max(...values)
+  const step = Math.max(5, Math.ceil((hi - lo + 2) / 2 / 5) * 5)
+  const start = Math.max(0, Math.floor((lo - 1) / step) * step)
+  return [start, start + step, start + 2 * step]
 }
