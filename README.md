@@ -79,7 +79,7 @@ The full design is in [`docs/spec.md`](docs/spec.md).
 - An NVIDIA GPU with 6 GB of VRAM or more (built on a GTX 1660 Super)
 - [Ollama](https://ollama.com)
 - Python 3.12
-- Node 20
+- Node 22 (the test tools need it; Node 20 reached end of life in April 2026)
 
 ## Setup
 
