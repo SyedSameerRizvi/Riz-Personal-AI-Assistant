@@ -1,10 +1,15 @@
+import { Menu } from 'lucide-react'
 import { useCallback, useEffect, useLayoutEffect, useReducer, useRef } from 'react'
+import { ApprovalCard } from '@/components/ApprovalCard'
 import { Composer } from '@/components/Composer'
 import { Logo } from '@/components/Logo'
+import { MemoryNote } from '@/components/MemoryNote'
 import { AssistantRow, AssistantText, ReplyActions, UserMessage } from '@/components/Message'
+import { ToolChip } from '@/components/ToolChip'
+import { Button } from '@/components/ui/button'
 import * as api from '@/lib/api'
 import { type ChatItem, chatReducer, initialChatState } from '@/lib/chatReducer'
-import type { ApproveDecision, ClientMessage, ServerEvent, Stats, ToolRequest } from '@/lib/types'
+import type { ApproveDecision, ClientMessage, ServerEvent, Stats } from '@/lib/types'
 
 interface ChatViewProps {
   chatId: string | null
@@ -15,6 +20,7 @@ interface ChatViewProps {
   subscribe: (fn: (e: ServerEvent) => void) => () => void
   createChat: () => Promise<string>
   onOpenMemory: () => void
+  onOpenSidebar: () => void
 }
 
 type Block =
@@ -107,7 +113,16 @@ export function ChatView(props: ChatViewProps) {
 
   return (
     <div className="flex min-h-0 grow flex-col">
-      <header className="flex h-14 shrink-0 items-center gap-3 border-b border-border px-6">
+      <header className="flex h-14 shrink-0 items-center gap-3 border-b border-border px-3 sm:px-6">
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Open sidebar"
+          className="md:hidden"
+          onClick={props.onOpenSidebar}
+        >
+          <Menu className="size-5" />
+        </Button>
         <h1 className="truncate text-[15px] font-semibold">{chatId ? props.title : 'New chat'}</h1>
         {props.model && (
           <span className="shrink-0 rounded-full border border-border px-2.5 py-0.5 font-mono text-xs text-muted-foreground">
@@ -151,7 +166,7 @@ export function ChatView(props: ChatViewProps) {
             )}
             {state.pending && (
               <AssistantRow>
-                <PendingPlaceholder request={state.pending} onDecide={onDecide} />
+                <ApprovalCard key={state.pending.call_id} request={state.pending} onDecide={onDecide} />
               </AssistantRow>
             )}
           </div>
@@ -175,6 +190,7 @@ function Turn({
   streaming,
   stats,
   onRegenerate,
+  onOpenMemory,
 }: {
   items: ChatItem[]
   isLast: boolean
@@ -200,36 +216,15 @@ function Turn({
             </p>
           )
         if (item.kind !== 'tool') return null
-        return (
-          <p key={i} className="text-[13px] text-muted-foreground">
-            {item.tool} · {item.decision}
-          </p>
-        )
+        if (item.tool === 'save_memory' && item.summary.startsWith('Saved to memory'))
+          return <MemoryNote key={i} text={item.args.text ?? ''} onOpen={onOpenMemory} />
+        return <ToolChip key={i} {...item} />
       })}
       {isLast && !streaming && text && <ReplyActions text={text} stats={stats} onRegenerate={onRegenerate} />}
     </AssistantRow>
   )
 }
 
-function PendingPlaceholder({
-  request,
-  onDecide,
-}: {
-  request: ToolRequest
-  onDecide: (d: ApproveDecision) => void
-}) {
-  return (
-    <div className="flex gap-2 text-sm">
-      {request.tool}
-      <button type="button" onClick={() => onDecide({ decision: 'allow', path: null })}>
-        Allow
-      </button>
-      <button type="button" onClick={() => onDecide({ decision: 'deny', path: null })}>
-        Deny
-      </button>
-    </div>
-  )
-}
 
 function EmptyState() {
   return (

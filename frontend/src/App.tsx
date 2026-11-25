@@ -141,6 +141,7 @@ export default function App() {
           </div>
         )}
         <main className="flex min-w-0 grow flex-col">
+          {view !== 'chat' && (
           <div className="flex h-14 items-center gap-2 border-b border-border px-3 md:hidden">
             <Button
               variant="ghost"
@@ -152,6 +153,7 @@ export default function App() {
             </Button>
             <span className="text-[15px] font-semibold">Riz</span>
           </div>
+          )}
           {view === 'chat' ? (
             <ChatView
               chatId={activeChatId}
@@ -162,6 +164,7 @@ export default function App() {
               subscribe={subscribe}
               createChat={createChat}
               onOpenMemory={() => setView('memory')}
+              onOpenSidebar={() => setSidebarOpen(true)}
             />
           ) : (
             <div className="flex min-h-0 grow flex-col">
